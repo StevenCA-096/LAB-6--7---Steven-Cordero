@@ -1,0 +1,91 @@
+/* Estilo General del Chat inspirado en Twitch */
+body {
+    background-color: #18181b; /* Color de fondo oscuro */
+    color: #efeff1; /* Texto claro */
+    font-family: 'Helvetica', sans-serif;
+}
+
+.navbar {
+    background-color: #202225; /* Fondo oscuro para la barra de navegación */
+}
+
+.navbar-brand {
+    color: #9147ff; /* Color morado típico de Twitch */
+    font-weight: bold;
+}
+
+.container {
+    margin-top: 50px;
+}
+
+.jumbotron-custom {
+    background-color: rgba(32, 34, 37, 0.9); /* Fondo semi-transparente */
+    border-radius: 10px; /* Bordes redondeados */
+    color: #ffffff;
+    padding: 2rem;
+}
+
+h1.display-4 {
+    color: #9147ff; /* Morado Twitch para el título */
+    font-weight: bold;
+}
+
+.btn-login {
+    background-color: #9147ff; /* Botón con color morado */
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+    padding: 10px 20px;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease;
+}
+
+.btn-login:hover {
+    background-color: #772ce8; /* Morado más oscuro en hover */
+}
+
+/* Estilo de los mensajes del chat */
+.chat-container {
+    background-color: #202225; /* Fondo oscuro para el área de chat */
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    overflow-y: auto;
+    max-height: 500px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3); /* Sombra ligera */
+}
+
+.chat-message {
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+    background-color: #2f3136; /* Fondo oscuro para cada mensaje */
+    display: flex;
+    align-items: center;
+}
+
+.chat-username {
+    color: #9147ff;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.chat-text {
+    color: #efeff1;
+    word-wrap: break-word;
+}
+
+/* Scroll personalizado */
+.chat-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-container::-webkit-scrollbar-thumb {
+    background-color: #9147ff;
+    border-radius: 10px;
+}
+
+.chat-container::-webkit-scrollbar-track {
+    background-color: #2f3136;
+}

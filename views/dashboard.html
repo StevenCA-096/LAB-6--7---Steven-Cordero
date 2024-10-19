@@ -1,0 +1,130 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Chat Socket.IO UNA</title>
+  <link rel="stylesheet" href="/static/css/StyleDashboard.css"> <!-- Enlace al archivo CSS externo -->
+</head>
+
+<body>
+  <h1>Bienvenidos al UNAChat!</h1>
+  <div class="chat-container">
+    <div class="chat-message">
+      <span class="chat-username">Moderador:</span>
+      <span class="chat-text">No a al bullying</span>
+    </div>
+    <div class="chat-message" id="messages">
+
+    </div>
+  </div>
+
+  <!-- Formulario de envío de mensajes -->
+  <div class="message-input-container">
+    <form id="messageForm">
+      <!-- Campo de nombre de usuario (opcional) -->
+      <input type="text" id="nombre" class="message-input" placeholder="Username" value="{{ user.nickname }}" readonly>
+      <!-- Campo para el mensaje -->
+      <input type="text" id="m" class="message-input" placeholder="Escribe un mensaje...">
+      <input type="text" id="url" class="message-input" placeholder="Indica una direccion de un video o imagen">
+      <button type="submit" class="btn-send-message">Enviar</button>
+    </form>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+
+  <script>
+    var colorHexTxt = "";
+
+    // Función para generar colores aleatorios
+    function getRandomColor() {
+      var letters = '0123456789ABCDEF';
+      var color = '#';
+      for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    }
+
+    $(function () {
+      // Inicializar la conexión a Socket.IO
+      var socket = io({
+        transports: ['websocket', 'polling'],  // Intentar WebSocket, fallback a polling
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000
+      });
+
+      // Enviar evento al servidor cuando se envía el formulario
+      $('form').submit(function (event) {
+        event.preventDefault();  // Evitar que la página se recargue
+
+        var nombreTxt = $('#nombre').val() || "Anónimo";
+        var urlTxt = $('#url').val() || "Anónimo";
+        var mensajeTxt = $('#m').val();
+
+        if (mensajeTxt.trim() !== "") {
+          var colorHexTxt = getRandomColor();  // Generar color aleatorio
+          var jsonMsg = { nombre: nombreTxt, mensaje: mensajeTxt, color: colorHexTxt, url: urlTxt };
+
+          // Enviar mensaje al servidor
+          socket.emit('Evento-Mensaje-Server', JSON.stringify(jsonMsg));
+
+          // Limpiar el campo de mensaje después de enviar
+          $('#m').val('');
+        }
+      });
+
+      // Escuchar los mensajes desde el servidor
+      socket.on('Evento-Mensaje-Server', function (msg) {
+        var msgJson = JSON.parse(msg);
+
+        let fileDisplay = ""
+        if (msgJson?.url) {
+          if (msgJson.url.match(/\.(jpeg|jpg|gif|png)$/)) {
+            fileDisplay += "<br/><img src='" + msgJson.url + "' style='height:200px;width:'200px'/>";
+          }
+          if (msgJson.url.match(/(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)) {
+            var videoId = msgJson.url.split('v=')[1];
+            var ampersandPosition = videoId.indexOf('&');
+            if (ampersandPosition != -1) {
+              videoId = videoId.substring(0, ampersandPosition);
+            }
+            fileDisplay += "<br/><iframe width='560' height='315' src='https://www.youtube.com/embed/" + videoId + "' frameborder='0' allowfullscreen></iframe>";
+          }
+        }
+
+        var mensajeDisplay = `
+      <div class="chat-message">
+        <span class="chat-username" style="color:${msgJson.color}">${msgJson.nombre}:</span>
+        <span class="chat-text">${msgJson.mensaje}</span>
+        ${fileDisplay}
+      </div>
+    `;
+
+        // Agregar el mensaje al contenedor de mensajes
+        $('#messages').append(mensajeDisplay);
+
+        // Desplazar la ventana de chat hacia abajo
+        $('#messages').scrollTop($('#messages')[0].scrollHeight);
+      });
+
+      // Manejar la conexión
+      socket.on('connect', function () {
+        console.log("Conectado al servidor de Socket.IO");
+      });
+
+      socket.on('disconnect', function (reason) {
+        console.log("Desconectado del servidor: ", reason);
+      });
+
+      socket.on('connect_error', function (error) {
+        console.log("Error de conexión: ", error);
+      });
+    });
+
+  </script>
+</body>
+
+</html>
